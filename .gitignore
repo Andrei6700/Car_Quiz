@@ -1,0 +1,45 @@
+## Visual Studio & .NET Git Ignore Template
+
+# Build results
+[Bb]in/
+[Oo]bj/
+[Xx]64/
+[Xx]86/
+[Aa]rm/
+[Aa]rm64/
+/build/
+
+# Visual Studio cache, files and folders
+.vs/
+*.user
+*.userosscache
+*.suo
+*.userprefs
+*.sln.docstates
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.dbmdl
+*.jfm
+
+# NuGet packages
+packages/
+# Restore packages using nuget or dotnet restore, do not check in dlls in packages
+!**/packages/repositories.config
+
+# Test results
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+
+# SQL Server local database files
+*.mdf
+*.ldf
+
+# Temp files and backup files
+*~
+*.tmp
+*.bak
+*.log

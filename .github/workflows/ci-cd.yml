@@ -1,0 +1,52 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build-test-deploy:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v2
+
+    - name: Restore NuGet Packages for Solution
+      run: nuget restore Car_Quiz.sln
+
+    - name: Restore NuGet Packages for Test Project
+      run: dotnet restore Car_Quiz.Tests\Car_Quiz.Tests.csproj
+
+    - name: Build Main Project (Release)
+      run: msbuild Car_Quiz\Car_Quiz.csproj /p:Configuration=Release /p:Platform="AnyCPU"
+
+    - name: Build Test Project (Release)
+      run: msbuild Car_Quiz.Tests\Car_Quiz.Tests.csproj /p:Configuration=Release /p:Platform="AnyCPU"
+
+    - name: Run Unit Tests
+      run: dotnet test Car_Quiz.Tests\Car_Quiz.Tests.csproj --configuration Release --no-build --verbosity normal
+
+    - name: Run Static Code Analysis (dotnet format)
+      run: dotnet format --verify-no-changes --verbosity normal
+
+    - name: Deploy (Copy to target directory)
+      shell: pwsh
+      run: |
+        New-Item -ItemType Directory -Force -Path .\deploy
+        Copy-Item -Path .\Car_Quiz\bin\Release\* -Destination .\deploy -Recurse -Force
+        Write-Output "Application deployed successfully to .\deploy"
+
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: Car_Quiz-Release-Build
+        path: deploy/
